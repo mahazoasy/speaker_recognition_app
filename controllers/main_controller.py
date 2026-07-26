@@ -96,6 +96,10 @@ class MainController:
             # thread séparé.
             QApplication.processEvents()
 
+        def wrapped_log(message):
+            on_log(message)
+            QApplication.processEvents()
+
         try:
             self.model.train(
                 records,
@@ -104,6 +108,7 @@ class MainController:
                 lr=lr,
                 epoch_callback=callback,
                 stop_flag=self._stop_flag,
+                log_callback=wrapped_log,
             )
             on_finished(True, "Entraînement terminé et modèle sauvegardé avec succès.")
         except Exception as exc:  # noqa: BLE001

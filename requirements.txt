@@ -1,5 +1,8 @@
 PySide6>=6.6.0
 torch>=2.1.0
+torchaudio>=2.1.0
+speechbrain>=1.0.0
+huggingface_hub>=0.20.0
 librosa>=0.10.1
 numpy>=1.24.0,<2.0.0
 sounddevice>=0.4.6

@@ -31,12 +31,36 @@ N_MFCC = 40                  # Nombre de coefficients MFCC
 MAX_FRAMES = 200             # Longueur temporelle fixe (padding/troncature)
 
 # Nombre d'échantillons vocaux à enregistrer par locuteur à l'enrôlement
-SAMPLES_PER_SPEAKER = 5
+# Recommandé : 10-15, dans des conditions variées (moment de la journée,
+# distance au micro, intonation) pour une empreinte vocale plus robuste.
+SAMPLES_PER_SPEAKER = 12
 
 # ------------------------------------------------------------------
-# Paramètres du réseau de neurones
+# Extracteur d'embeddings pré-entraîné (SpeechBrain ECAPA-TDNN)
 # ------------------------------------------------------------------
-EMBEDDING_DIM = 128           # Dimension du vecteur d'empreinte vocale
+# Modèle pré-entraîné sur VoxCeleb (des dizaines de milliers de locuteurs).
+# Il est utilisé UNIQUEMENT en inférence (poids gelés) pour transformer
+# chaque enregistrement en une empreinte vocale de 192 dimensions. Un petit
+# classifieur est ensuite entraîné par-dessus sur vos locuteurs enrôlés
+# (apprentissage par transfert). Nécessite une connexion internet lors du
+# tout premier lancement (téléchargement automatique et mise en cache
+# des poids, ~80 Mo).
+PRETRAINED_SOURCE = "speechbrain/spkrec-ecapa-voxceleb"
+PRETRAINED_EMBEDDING_DIM = 192
+
+# ------------------------------------------------------------------
+# Augmentation de données (appliquée pendant l'entraînement uniquement)
+# ------------------------------------------------------------------
+AUGMENTATIONS_PER_SAMPLE = 4   # copies augmentées générées par enregistrement
+NOISE_SNR_RANGE_DB = (12, 30)  # rapport signal/bruit gaussien ajouté
+VOLUME_GAIN_RANGE_DB = (-8, 8) # variation de volume
+TIME_SHIFT_MAX_SEC = 0.15      # décalage temporel aléatoire max
+
+# ------------------------------------------------------------------
+# Paramètres de la tête de classification (entraînée sur les embeddings)
+# ------------------------------------------------------------------
+EMBEDDING_DIM = 192           # Dimension de sortie du modèle ECAPA-TDNN pré-entraîné
+CLASSIFIER_HIDDEN_DIM = 128
 DEFAULT_EPOCHS = 40
 DEFAULT_BATCH_SIZE = 8
 DEFAULT_LR = 1e-3

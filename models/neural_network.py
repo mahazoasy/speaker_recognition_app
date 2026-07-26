@@ -19,6 +19,36 @@ import torch.nn.functional as F
 import config
 
 
+class EmbeddingClassifierHead(nn.Module):
+    """
+    Petit classifieur entraîné PAR-DESSUS les embeddings ECAPA-TDNN
+    pré-entraînés (gelés). C'est la seule partie du pipeline qui apprend
+    réellement sur vos locuteurs enrôlés — d'où un entraînement rapide et
+    efficace même avec peu d'échantillons, puisque les embeddings en
+    entrée encodent déjà une information vocale très riche.
+    """
+
+    def __init__(self, embedding_dim=config.PRETRAINED_EMBEDDING_DIM,
+                 hidden_dim=config.CLASSIFIER_HIDDEN_DIM, num_classes=2):
+        super().__init__()
+        self.embedding_dim = embedding_dim
+        self.num_classes = num_classes
+        self.net = nn.Sequential(
+            nn.Linear(embedding_dim, hidden_dim),
+            nn.BatchNorm1d(hidden_dim),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(hidden_dim, num_classes),
+        )
+
+    def forward(self, x):
+        return self.net(x)
+
+    def resize_classifier(self, num_classes):
+        self.net[-1] = nn.Linear(self.net[-1].in_features, num_classes)
+        self.num_classes = num_classes
+
+
 class SEBlock(nn.Module):
     """Squeeze-and-Excitation : pondère les canaux selon leur importance
     (même principe que dans ECAPA-TDNN)."""
