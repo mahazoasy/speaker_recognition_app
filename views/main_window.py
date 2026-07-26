@@ -1,11 +1,3 @@
-"""
-views/main_window.py
------------------------
-Fenêtre principale : en-tête stylisé + QTabWidget regroupant les
-4 modules fonctionnels de l'application (Enrôlement, Entraînement,
-Identification/Vérification, Historique).
-"""
-
 import os
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (

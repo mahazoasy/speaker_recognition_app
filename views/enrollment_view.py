@@ -1,10 +1,3 @@
-"""
-views/enrollment_view.py
----------------------------
-Onglet "Enrôlement" : création d'un locuteur et capture de plusieurs
-échantillons vocaux via le microphone.
-"""
-
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton,
@@ -167,7 +160,7 @@ class EnrollmentView(QWidget):
         self.sample_label.setText(
             f"Échantillon {self.sample_index} / {config.SAMPLES_PER_SPEAKER}"
         )
-        self.status_label.setText(f"✅ Échantillon {self.sample_index} enregistré avec succès.")
+        self.status_label.setText(f"Échantillon {self.sample_index} enregistré avec succès.")
         self.record_btn.setEnabled(True)
         self._refresh_user_list()
 

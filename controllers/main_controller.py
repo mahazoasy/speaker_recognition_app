@@ -1,18 +1,3 @@
-"""
-controllers/main_controller.py
----------------------------------
-Contrôleur (au sens MVC) : orchestre les interactions entre les vues
-PySide6, la base de données SQLite et le modèle de réseau de neurones.
-
-NOTE IMPORTANTE :
-L'entraînement tourne désormais dans le THREAD PRINCIPAL (pas dans un
-QThread séparé). Sur certains systèmes Linux, faire cohabiter PyTorch
-avec un QThread provoque un "Segmentation fault" (conflit de pools de
-threads internes entre Qt, PyTorch et les bibliothèques BLAS/OpenMP).
-On garde l'interface réactive en appelant QApplication.processEvents()
-après chaque époque.
-"""
-
 import os
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtWidgets import QApplication

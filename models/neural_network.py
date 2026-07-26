@@ -1,17 +1,3 @@
-"""
-models/neural_network.py
---------------------------
-Architecture du réseau de neurones : un CNN 1D convolutionnel inspiré
-des architectures type TDNN (Time-Delay Neural Network, dont s'inspire
-ECAPA-TDNN) appliqué sur des trames MFCC + delta + delta-delta.
-
-Le réseau produit deux sorties :
-  - un "embedding" (empreinte vocale) de dimension EMBEDDING_DIM,
-    utilisé pour la VÉRIFICATION (similarité cosinus entre deux voix).
-  - des logits de classification, utilisés pour l'IDENTIFICATION
-    (à quel locuteur enrôlé appartient cette voix, en probabilité).
-"""
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -20,13 +6,6 @@ import config
 
 
 class EmbeddingClassifierHead(nn.Module):
-    """
-    Petit classifieur entraîné PAR-DESSUS les embeddings ECAPA-TDNN
-    pré-entraînés (gelés). C'est la seule partie du pipeline qui apprend
-    réellement sur vos locuteurs enrôlés — d'où un entraînement rapide et
-    efficace même avec peu d'échantillons, puisque les embeddings en
-    entrée encodent déjà une information vocale très riche.
-    """
 
     def __init__(self, embedding_dim=config.PRETRAINED_EMBEDDING_DIM,
                  hidden_dim=config.CLASSIFIER_HIDDEN_DIM, num_classes=2):

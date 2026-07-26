@@ -1,12 +1,3 @@
-"""
-main.py
---------
-Point d'entrée de l'application VoxID — Reconnaissance du Locuteur
-par Réseau de Neurones.
-
-Lancer avec :  python main.py
-"""
-
 import os
 os.environ.setdefault("OMP_NUM_THREADS", "1")
 os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")

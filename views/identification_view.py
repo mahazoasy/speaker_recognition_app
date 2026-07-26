@@ -1,11 +1,3 @@
-"""
-views/identification_view.py
--------------------------------
-Onglet "Identification / Vérification" : enregistre une voix et
-détermine soit "qui parle" (identification, 1:N), soit "est-ce bien X"
-(vérification, 1:1), avec affichage du score de confiance.
-"""
-
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QComboBox,

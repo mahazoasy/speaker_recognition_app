@@ -1,10 +1,3 @@
-"""
-views/history_view.py
-------------------------
-Onglet "Historique" : affiche l'historique des tentatives
-d'identification / vérification enregistrées en base SQLite.
-"""
-
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QFrame,

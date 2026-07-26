@@ -1,10 +1,3 @@
-"""
-config.py
----------
-Configuration centralisée du projet de Reconnaissance du Locuteur.
-Toutes les constantes (audio, réseau de neurones, chemins) sont ici.
-"""
-
 import os
 
 # ------------------------------------------------------------------

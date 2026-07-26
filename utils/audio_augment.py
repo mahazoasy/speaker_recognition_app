@@ -1,12 +1,3 @@
-"""
-utils/audio_augment.py
--------------------------
-Augmentation de données audio : génère des variantes réalistes de chaque
-enregistrement (bruit léger, variation de volume, décalage temporel) afin
-d'enrichir artificiellement le jeu d'entraînement et de rendre le
-classifieur plus robuste aux conditions réelles d'enregistrement.
-"""
-
 import numpy as np
 
 import config

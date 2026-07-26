@@ -5,7 +5,7 @@ d'enrôler des locuteurs, d'entraîner un réseau de neurones (CNN de
 type TDNN, inspiré d'ECAPA-TDNN) sur leurs empreintes vocales, puis de
 les **identifier** (1:N) ou de les **vérifier** (1:1) en temps réel.
 
-## ✨ Fonctionnalités
+## Fonctionnalités
 
 - Interface graphique moderne en PySide6 (thème sombre, accent orange)
 - Enregistrement audio en temps réel (microphone), sans geler l'UI (QThread)
@@ -19,7 +19,7 @@ les **identifier** (1:N) ou de les **vérifier** (1:1) en temps réel.
 - Historique des reconnaissances consultable dans l'application
 - Architecture **MVC** : `models/`, `views/`, `controllers/`, `database/`, `utils/`
 
-## 📁 Structure du projet
+## Structure du projet
 
 ```
 speaker_recognition_app/
@@ -51,7 +51,7 @@ speaker_recognition_app/
     └── audio/                   # Enregistrements .wav par utilisateur
 ```
 
-## 🚀 Installation
+## Installation
 
 ```bash
 python -m venv venv
@@ -60,17 +60,17 @@ source venv/bin/activate        # Windows : venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-> ⚠️ `torch` est volumineux : pour une installation CPU uniquement plus
+>`torch` est volumineux : pour une installation CPU uniquement plus
 > rapide, vous pouvez d'abord installer la version CPU officielle :
 > `pip install torch --index-url https://download.pytorch.org/whl/cpu`
 
-## ▶️ Lancement
+## Lancement
 
 ```bash
 python main.py
 ```
 
-## 🧭 Guide d'utilisation
+## Guide d'utilisation
 
 1. **Onglet Enrôlement** : saisissez le nom d'un locuteur, cliquez sur
    « Démarrer l'enrôlement » puis enregistrez les échantillons demandés
@@ -89,7 +89,7 @@ python main.py
      similarité cosinus.
 4. **Onglet Historique** : consultez toutes les tentatives passées.
 
-## 🧠 Détails techniques du réseau de neurones
+## Détails techniques du réseau de neurones
 
 - **Entrée** : MFCC (40 coefficients) + delta + delta-delta → matrice
   `(120, 200)` normalisée (moyenne/écart-type par canal).
@@ -108,7 +108,7 @@ python main.py
 - **Vérification** : similarité cosinus entre l'embedding calculé et le
   centroïde (moyenne des embeddings) du locuteur prétendu.
 
-## 📌 Notes
+## Notes
 
 - Le micro doit être accessible au système (permissions du système
   d'exploitation) — testez avec `python -c "import sounddevice as sd; print(sd.query_devices())"`

@@ -1,10 +1,3 @@
-"""
-utils/audio_recorder.py
-------------------------
-Enregistrement audio en temps réel via sounddevice, exécuté dans un
-QThread pour ne jamais bloquer l'interface graphique.
-"""
-
 import os
 import numpy as np
 import sounddevice as sd

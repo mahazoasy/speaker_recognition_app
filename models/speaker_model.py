@@ -1,22 +1,3 @@
-"""
-models/speaker_model.py
---------------------------
-Encapsule le cycle de vie complet du modèle de reconnaissance du
-locuteur, basé sur l'APPRENTISSAGE PAR TRANSFERT :
-
-  1. Chaque enregistrement (+ ses variantes augmentées : bruit léger,
-     variation de volume, décalage temporel) est transformé en une
-     empreinte vocale de 192 dimensions par le modèle ECAPA-TDNN
-     pré-entraîné sur VoxCeleb (poids gelés, jamais entraînés ici).
-  2. Un petit classifieur (EmbeddingClassifierHead) est entraîné
-     par-dessus ces embeddings pour reconnaître VOS locuteurs enrôlés.
-
-Ce découplage donne une bien meilleure précision qu'un entraînement
-"from scratch" sur quelques enregistrements, car les embeddings ECAPA
-encodent déjà une information vocale extrêmement riche apprise sur des
-dizaines de milliers de locuteurs.
-"""
-
 import json
 import os
 import numpy as np

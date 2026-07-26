@@ -1,10 +1,3 @@
-"""
-views/training_view.py
--------------------------
-Onglet "Entraînement" : lance l'entraînement du réseau de neurones
-dans un thread séparé et affiche en direct les courbes de loss/accuracy.
-"""
-
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QSpinBox,

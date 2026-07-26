@@ -1,20 +1,3 @@
-"""
-models/pretrained_embedder.py
---------------------------------
-Charge le modèle ECAPA-TDNN pré-entraîné de SpeechBrain
-(speechbrain/spkrec-ecapa-voxceleb, entraîné sur des dizaines de milliers
-de locuteurs issus de VoxCeleb) et l'utilise UNIQUEMENT en inférence
-(poids gelés) pour transformer un signal audio en une empreinte vocale
-(embedding) de 192 dimensions.
-
-C'est ce composant qui apporte l'intelligence "transfert d'apprentissage"
-au projet : au lieu d'entraîner un réseau from scratch sur quelques
-enregistrements, on réutilise un modèle déjà expert en reconnaissance
-vocale et on ne fait qu'entraîner un petit classifieur par-dessus.
-
-Chargé une seule fois (singleton) car l'initialisation est coûteuse.
-"""
-
 import os
 import threading
 

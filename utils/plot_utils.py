@@ -1,11 +1,3 @@
-"""
-utils/plot_utils.py
----------------------
-Canvas matplotlib réutilisables, intégrés dans les widgets PySide6,
-pour les courbes d'entraînement (loss/accuracy) et l'histogramme
-des probabilités de reconnaissance.
-"""
-
 import matplotlib
 matplotlib.use("QtAgg")
 

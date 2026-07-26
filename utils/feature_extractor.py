@@ -1,11 +1,3 @@
-"""
-utils/feature_extractor.py
-----------------------------
-Extraction des caractéristiques acoustiques (MFCC + delta + delta-delta)
-à partir d'un signal audio brut, avec normalisation et mise en forme
-fixe (padding / troncature) pour alimenter le réseau de neurones.
-"""
-
 import numpy as np
 import librosa
 
