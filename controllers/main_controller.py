@@ -3,65 +3,29 @@ controllers/main_controller.py
 ---------------------------------
 Contrôleur (au sens MVC) : orchestre les interactions entre les vues
 PySide6, la base de données SQLite et le modèle de réseau de neurones.
-Contient aussi le QThread d'entraînement pour ne pas geler l'UI.
+
+NOTE IMPORTANTE :
+L'entraînement tourne désormais dans le THREAD PRINCIPAL (pas dans un
+QThread séparé). Sur certains systèmes Linux, faire cohabiter PyTorch
+avec un QThread provoque un "Segmentation fault" (conflit de pools de
+threads internes entre Qt, PyTorch et les bibliothèques BLAS/OpenMP).
+On garde l'interface réactive en appelant QApplication.processEvents()
+après chaque époque.
 """
 
 import os
-from PySide6.QtCore import QObject, QThread, Signal
+from PySide6.QtCore import QObject, Signal
+from PySide6.QtWidgets import QApplication
 
 import config
 from database.db_manager import DBManager
 from models.speaker_model import SpeakerModel
 
 
-class TrainingWorker(QObject):
-    """Exécute l'entraînement dans un thread séparé et transmet la
-    progression à l'interface via des signaux Qt."""
-
-    epoch_done = Signal(int, float, float, object, object)  # epoch, loss, acc, val_loss, val_acc
-    finished = Signal(bool, str)   # succès, message
-    log = Signal(str)
-
-    def __init__(self, model: SpeakerModel, db: DBManager, epochs, batch_size, lr):
-        super().__init__()
-        self.model = model
-        self.db = db
-        self.epochs = epochs
-        self.batch_size = batch_size
-        self.lr = lr
-        self.stopped = False
-
-    def run(self):
-        try:
-            records = self.db.get_all_recordings_with_names()
-            n_speakers = len({r["name"] for r in records})
-            if n_speakers < 2:
-                self.finished.emit(
-                    False,
-                    "Il faut au moins 2 locuteurs enrôlés (avec enregistrements) "
-                    "pour lancer l'entraînement."
-                )
-                return
-
-            self.db.clear_training_history()
-            self.log.emit(f"Entraînement démarré sur {len(records)} enregistrements, "
-                           f"{n_speakers} locuteurs.")
-
-            def callback(epoch, loss, acc, val_loss, val_acc):
-                self.db.log_training_epoch(epoch, loss, acc, val_loss, val_acc)
-                self.epoch_done.emit(epoch, loss, acc, val_loss, val_acc)
-
-            self.model.train(
-                records,
-                epochs=self.epochs,
-                batch_size=self.batch_size,
-                lr=self.lr,
-                epoch_callback=callback,
-                stop_flag=self,
-            )
-            self.finished.emit(True, "Entraînement terminé et modèle sauvegardé avec succès.")
-        except Exception as exc:  # noqa: BLE001
-            self.finished.emit(False, f"Erreur pendant l'entraînement : {exc}")
+class _StopFlag:
+    """Petit objet mutable partagé pour permettre d'interrompre
+    l'entraînement en cours (voir SpeakerModel.train -> stop_flag)."""
+    stopped = False
 
 
 class MainController:
@@ -70,8 +34,7 @@ class MainController:
         self.model = SpeakerModel()
         self.model.load()  # charge un modèle existant s'il y en a un
 
-        self._train_thread = None
-        self._train_worker = None
+        self._stop_flag = None
 
     # ------------------------------------------------------------------
     # Utilisateurs / Enrôlement
@@ -105,29 +68,50 @@ class MainController:
         self.db.delete_user(user_id)
 
     # ------------------------------------------------------------------
-    # Entraînement (asynchrone)
+    # Entraînement (dans le thread principal, UI tenue à jour via processEvents)
     # ------------------------------------------------------------------
     def start_training(self, epochs, batch_size, lr, on_epoch, on_finished, on_log):
-        self._train_thread = QThread()
-        self._train_worker = TrainingWorker(self.model, self.db, epochs, batch_size, lr)
-        self._train_worker.moveToThread(self._train_thread)
+        records = self.db.get_all_recordings_with_names()
+        n_speakers = len({r["name"] for r in records})
+        if n_speakers < 2:
+            on_finished(
+                False,
+                "Il faut au moins 2 locuteurs enrôlés (avec enregistrements) "
+                "pour lancer l'entraînement."
+            )
+            return
 
-        self._train_thread.started.connect(self._train_worker.run)
-        self._train_worker.epoch_done.connect(on_epoch)
-        self._train_worker.log.connect(on_log)
+        self.db.clear_training_history()
+        on_log(f"Entraînement démarré sur {len(records)} enregistrements, "
+               f"{n_speakers} locuteurs.")
+        QApplication.processEvents()
 
-        def _cleanup(success, message):
-            on_finished(success, message)
-            self._train_thread.quit()
+        self._stop_flag = _StopFlag()
 
-        self._train_worker.finished.connect(_cleanup)
-        self._train_thread.finished.connect(self._train_thread.deleteLater)
+        def callback(epoch, loss, acc, val_loss, val_acc):
+            self.db.log_training_epoch(epoch, loss, acc, val_loss, val_acc)
+            on_epoch(epoch, loss, acc, val_loss, val_acc)
+            # Garde l'interface réactive (barre de progression, courbes,
+            # bouton Arrêter) sans faire tourner l'entraînement dans un
+            # thread séparé.
+            QApplication.processEvents()
 
-        self._train_thread.start()
+        try:
+            self.model.train(
+                records,
+                epochs=epochs,
+                batch_size=batch_size,
+                lr=lr,
+                epoch_callback=callback,
+                stop_flag=self._stop_flag,
+            )
+            on_finished(True, "Entraînement terminé et modèle sauvegardé avec succès.")
+        except Exception as exc:  # noqa: BLE001
+            on_finished(False, f"Erreur pendant l'entraînement : {exc}")
 
     def stop_training(self):
-        if self._train_worker:
-            self._train_worker.stopped = True
+        if self._stop_flag is not None:
+            self._stop_flag.stopped = True
 
     def get_training_history(self):
         return self.db.get_training_history()
